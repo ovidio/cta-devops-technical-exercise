@@ -70,20 +70,20 @@ Assuming you are running a linux machine, please verify that the below apps are 
    git clone git@github.com:ovidio/cta-devops-technical-exercise.git
    ```
 3. Create and activate Python virtual env
-    ```
+    ```sh
     python3 -m venv myenv
     source myenv/bin/activate
     ```
 4. Add API Key to `app.py`
-   ```sh
+   ```python
    7 - API_KEY = "[API_KEY]"
    ```
 5. Build Docker Image
    ```sh
-   docker build -t [Insert Image Name] .
+   docker build -t [Image Name].
    ```
 6. Run Docker Image in Detached mode and Publishing port 5000 (detached mode is needed when running locally)
-   ```js
+   ```sh
    docker run -d -p 5000:5000 [Image Name]
    ```
 7. Open Browser to [`localhost:5000`](localhost:5000)
