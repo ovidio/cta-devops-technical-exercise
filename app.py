@@ -4,7 +4,7 @@ import os
 app = Flask(__name__)
 
 # Takes in API key from github secrets
-API_KEY = "A1wSZSlgAoeZPtn3tSuKO1JACKxHXDM2"
+API_KEY = os.environ['GIPHY_API_KEY']
 GIPHY_API_URL = "https://api.giphy.com/v1/gifs/random"
 
 @app.route('/')
