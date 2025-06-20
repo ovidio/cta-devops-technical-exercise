@@ -9,6 +9,10 @@
 
 Hello, this is Ovidio Reyna. This is my solution to the Community Tech Alliance DevOps Engineer - Technical Exercise.
 
+TD/LR: 
+* Live python app can be found here: [https://cta-devops-exercise-prod-938429033253.us-east1.run.app](https://cta-devops-exercise-prod-938429033253.us-east1.run.app)
+* Code can be found here: [https://github.com/ovidio/cta-devops-technical-exercise](https://github.com/ovidio/cta-devops-technical-exercise)
+
 I chose option 2 which is described below:
 <div>
   <h3>Option 2: CI/CD Pipeline for a Cloud Run Service</h3>
@@ -171,8 +175,16 @@ This could also be extened to use releases and tags.
 
 ## Open Questions, Assumptions, Trade-offs
 
-Some assumptions I had to make is that the infrastructure and connections are already present: specifically, Artifacts and any APIs that need to be turned on in GCP. I didn't know that the APIs had to be specifically turned on in GCP so that took some time to figure out.
+<h3>Assumptions</h3>
+* Some assumptions I had to make is that the infrastructure and connections are already present: specifically, Artifacts and any APIs that need to be turned on in GCP. I didn't know that the APIs had to be specifically turned on in GCP so that took some time to figure out.
 
-One trade-off I made for this project is that I opened up GCP Cloud Run to allow unathenticated accecss to the instance. This was for testing purposes and in an Enterprise setting wouldn't do that even for dev or other lower envs.
+
+<h3>Trade-Offs</h3>
+
+* I had never used Github Secrets before this project. So I had the Giphy API key hard coded for a but until I verified that the app was running correctly and then figured out how to incorporate the secrets. So a Giphy API key is in the git history. I've since revoked that API and added a new one to Github Secrets.
+
+* I opened up GCP Cloud Run to allow unathenticated accecss to the instance. This was for testing purposes and in an Enterprise setting wouldn't do that even for dev or other lower envs.
+
+* Another trade-off I made for the sake of time was not implement a check on whether the app code had changed and if not then there's no need to run the workflow. For example, if I make a change to the README file it will run the entire workflow and deploy a container to GCP that is the same as the previous one.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
