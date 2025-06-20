@@ -61,28 +61,35 @@ Assuming you are running a linux machine, please verify that the below apps are 
 
 * Docker Engine - Please refer [to the official Docker documentation on how to install Docker on linux](https://docs.docker.com/engine/install/ubuntu/).
 
+
 ### Installation
 
 1. Giphy API Key: Sign up at Giphy Developers to get your free API key: [Giphy Developers](https://developers.giphy.com/).
 2. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone git@github.com:ovidio/cta-devops-technical-exercise.git
    ```
-3. Add API Key to `app.py`
+3. Create and activate Python virtual env
+  ```
+  python3 -m venv myenv
+  source myenv/bin/activate
+
+  ```
+4. Add API Key to `app.py`
    ```sh
    7 - API_KEY = "[API_KEY]"
    ```
-4. Build Docker Image
+5. Build Docker Image
    ```sh
    docker build -t [Insert Image Name] .
    ```
-5. Run Docker Image in Detached mode and Publishing port 5000 (detached mode is needed when running locally)
+6. Run Docker Image in Detached mode and Publishing port 5000 (detached mode is needed when running locally)
    ```js
    docker run -d -p 5000:5000 [Image Name]
    ```
-6. Open Browser to [`localhost:5000`](localhost:5000)
+7. Open Browser to [`localhost:5000`](localhost:5000)
 
-7. Note: To run this using the Github Workflow there are a few secrets that need to be created in the repo > Secrets and Variables > Actions > Repository Secrets (or Env secrets). The secrets are listed below:
+8. Note: To run this using the Github Workflow there are a few secrets that need to be created in the repo > Secrets and Variables > Actions > Repository Secrets (or Env secrets). The secrets are listed below:
     ```
     GCP_DEPLOY_SA       - GCP Service Account Details (in JSON format)
     GCP_LOCATION        - GCP Location, ex: us-east1
