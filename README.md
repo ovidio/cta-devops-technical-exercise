@@ -80,7 +80,7 @@ Assuming you are running a linux machine, please verify that the below apps are 
 
 7. Note: To run this using the Github Workflow there are a few secrets that need to be created in the repo > Secrets and Variables > Actions > Repository Secrets (or Env secrets). The secrets are listed below:
     ```
-    GCP_DEPLOY_SA       - GCP Service Account Key
+    GCP_DEPLOY_SA       - GCP Service Account Details (in JSON format)
     GCP_LOCATION        - GCP Location, ex: us-east1
     GCP_PROJECT_ID      - ID of GCP Project
     GCP_PROJECT_SA_NAME - GCP Service Account Email
