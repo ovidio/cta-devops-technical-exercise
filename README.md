@@ -173,6 +173,6 @@ This could also be extened to use releases and tags.
 
 Some assumptions I had to make is that the infrastructure and connections are already present: specifically, Artifacts and any APIs that need to be turned on in GCP. I didn't know that the APIs had to be specifically turned on in GCP so that took some time to figure out.
 
-One trade-off I made for this project is that I opened up GCP Cloud Run to allow unathenticated accecss to the instance in dev. This was for testing purposes and in an Enterprise setting wouldn't do that even for dev or other lower envs.
+One trade-off I made for this project is that I opened up GCP Cloud Run to allow unathenticated accecss to the instance. This was for testing purposes and in an Enterprise setting wouldn't do that even for dev or other lower envs.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
