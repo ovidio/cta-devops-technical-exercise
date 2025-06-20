@@ -1,0 +1,124 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+# Currently, this workflow is set to run in it's entirety whenever there is a push or pr created on any branch.
+# I've included a simple example of how to add a manual deployment that requires the user to input whether
+# they want to deploy the python app after linting. This would require some modification of the current
+# workflow as you would have to include another jobs and have that job be dependent on the user input.
+# line 64-75 shows the minimal modification needed to bifurcate the workflow into just linting and adding in 
+# the docker build and deploy to GCP.
+
+on:
+  workflow_dispatch:
+  #   inputs:
+  #     deploy:
+  #       description: 'Flag for Deployment'
+  #       required: true
+  #       default: 'false'
+  #       type: choice
+  #       options:
+  #       - false
+  #       - true
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  GIPHY_API_KEY: '${{secrets.GIPHY_API_KEY}}'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Lint and Build Python Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.9"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  # The below is an example of what is needed to modify the workflow for linting and buiding 
+  # and deploying to GCP.
+
+  # deploy:
+  #   name: Connect to GCP and deploy ContainerMore actions
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy == 'true')
+
+
+  #   steps:
+
+    - name: Determine Environment
+      id: determine-env
+      run: |
+        # Determine environment based on branch        
+        if [ "${{ github.ref_name }}" == "master" ]; then
+          echo "MY_PROJECT_ENV=prod" >> $GITHUB_ENV
+        elif [ "${{ github.ref_name }}" == "uat" ]; then
+          echo "MY_PROJECT_ENV=stg" >> $GITHUB_ENV
+        else
+          echo "MY_PROJECT_ENV=dev" >> $GITHUB_ENV
+        fi
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_DEPLOY_SA }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+      
+    - name: "Use gcloud CLI"
+      run: "gcloud info"
+    
+    - name: Configure Docker to use gcloud as a credential helper
+      run: |
+        gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev -q
+
+    - name: Build and Push Docker image
+      run: |
+        IMAGE_URI="${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-images/my-project-${{ env.MY_PROJECT_ENV  }}:latest"
+        docker build --build-arg GIPHY_API_KEY=$GIPHY_API_KEY -t "$IMAGE_URI" .
+        docker push "$IMAGE_URI"
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy my-service-${{ env.MY_PROJECT_ENV  }}  \
+          --image "${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-images/my-project-${{ env.MY_PROJECT_ENV  }}:latest" \
+          --platform managed \
+          --region ${{ secrets.GCP_LOCATION }} \
+          --port 5000 \
+          --memory 512Mi \
+          --cpu 1 \
+          --min-instances 0 \
+          --max-instances 1 \
+          --project ${{ secrets.GCP_PROJECT_ID  }} \
+          --service-account ${{ secrets.GCP_PROJECT_SA_NAME }} \
+          --set-env-vars MY_ENV=${{ env.MY_PROJECT_ENV }}
